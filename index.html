@@ -8,59 +8,56 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 20px;
-      background-color: #f4f4f4;
+      background-color: #f0f0f5;
       color: #333;
-    }
-    h1 {
-      text-align: center;
-      color: #2c3e50;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
     }
     .container {
+      width: 90%;
       max-width: 600px;
       background: #fff;
-      padding: 20px;
-      margin: 0 auto;
+      padding: 30px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      text-align: center;
     }
-    input[type=\"text\"], input[type=\"file\"] {
+    h1 {
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+    input[type="text"], input[type="file"] {
       width: 100%;
       padding: 10px;
-      margin-top: 10px;
       margin-bottom: 10px;
       border: 1px solid #ccc;
       border-radius: 6px;
+      font-size: 1rem;
     }
     button {
       padding: 10px 20px;
+      margin-top: 10px;
       font-size: 1rem;
       background-color: #3498db;
       color: white;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      width: 100%;
     }
     button:hover {
       background-color: #2980b9;
     }
-    #qrcode {
+    canvas {
       margin-top: 20px;
-      text-align: center;
     }
     .note {
-      font-size: 0.9rem;
-      margin-top: 20px;
+      font-size: 0.85rem;
       color: #666;
-      line-height: 1.5;
-    }
-    footer {
-      text-align: center;
-      margin-top: 40px;
-      font-size: 0.8rem;
-      color: #aaa;
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -71,33 +68,43 @@
     <input type="text" id="textInput" placeholder="テキストやURLを入力してください" />
     <input type="file" id="fileInput" />
     <button onclick="generateQRCode()">QRコードを生成</button>
-
     <div id="qrcode"></div>
+    <button id="downloadBtn" style="display:none;" onclick="downloadQRCode()">QRコードをダウンロード</button>
 
     <div class="note">
-      ※ 本アプリはローカルで動作しており、アップロードされたファイルや入力されたデータは外部に送信されません。<br>
-      ※ テキストファイル・画像（Base64）・CSV形式に対応しています。<br>
-      ※ Googleドキュメントなどの共有リンクもQRコード化できます。<br>
-      ※ QRコードは内容が長いと読み取りづらくなる場合があります。
+      入力内容は外部に送信されません。<br>安全にご利用いただけます。
     </div>
   </div>
-
-  <footer>
-    &copy; 2025 QR Generator App by You. All rights reserved.
-  </footer>
 
   <script>
     function generateQRCode() {
       const text = document.getElementById('textInput').value.trim();
-      const qrcodeContainer = document.getElementById('qrcode');
-      qrcodeContainer.innerHTML = '';
+      const container = document.getElementById('qrcode');
+      const downloadBtn = document.getElementById('downloadBtn');
+
+      container.innerHTML = '';
+      downloadBtn.style.display = 'none';
+
       if (text) {
-        QRCode.toCanvas(document.createElement('canvas'), text, function (err, canvas) {
-          if (!err) qrcodeContainer.appendChild(canvas);
+        const canvas = document.createElement('canvas');
+        QRCode.toCanvas(canvas, text, { width: 256 }, function (err) {
+          if (!err) {
+            container.appendChild(canvas);
+            downloadBtn.style.display = 'inline-block';
+          }
         });
       } else {
-        alert(\"テキストを入力するか、ファイルを選択してください。\");
+        alert("テキストを入力するか、ファイルを選択してください。");
       }
+    }
+
+    function downloadQRCode() {
+      const canvas = document.querySelector('#qrcode canvas');
+      if (!canvas) return;
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = 'qrcode.png';
+      link.click();
     }
 
     document.getElementById('fileInput').addEventListener('change', function(event) {
