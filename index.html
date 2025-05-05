@@ -3,109 +3,121 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="favicon.png" />
   <title>QRコード生成アプリ</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #f0f0f5;
-      color: #333;
       margin: 0;
-      padding: 0;
+      padding: 40px 20px;
+      background: linear-gradient(to bottom right, #e0f7fa, #ffffff);
+      color: #333;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      min-height: 100vh;
     }
+
+    .logo {
+      font-size: 2.5rem;
+      color: #2c3e50;
+      margin-bottom: 20px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
     .container {
-      width: 90%;
+      width: 100%;
       max-width: 600px;
       background: #fff;
-      padding: 30px;
+      padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       text-align: center;
     }
-    h1 {
-      margin-bottom: 20px;
-      color: #2c3e50;
-    }
+
     input[type="text"], input[type="file"] {
       width: 100%;
       padding: 10px;
-      margin-bottom: 10px;
+      margin: 10px 0;
+      font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 6px;
-      font-size: 1rem;
     }
+
     button {
-      padding: 10px 20px;
-      margin-top: 10px;
-      font-size: 1rem;
+      width: 100%;
+      padding: 12px;
       background-color: #3498db;
       color: white;
       border: none;
       border-radius: 6px;
+      font-size: 1rem;
       cursor: pointer;
+      transition: transform 0.2s ease-in-out;
     }
+
     button:hover {
       background-color: #2980b9;
+      transform: scale(1.02);
     }
-    canvas {
+
+    #qrcode {
       margin-top: 20px;
     }
-    .note {
-      font-size: 0.85rem;
-      color: #666;
-      margin-top: 20px;
+
+    .sidebar {
+      max-width: 600px;
+      margin-top: 30px;
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    footer {
+      margin-top: 40px;
+      font-size: 0.8rem;
+      color: #aaa;
     }
   </style>
 </head>
 <body>
+  <h1 class="logo">QR Code Generator</h1>
+
   <div class="container">
-    <h1>QRコード生成アプリ</h1>
-
-    <input type="text" id="textInput" placeholder="テキストやURLを入力してください" />
+    <input type="text" id="textInput" placeholder="Enter text or URL" />
     <input type="file" id="fileInput" />
-    <button onclick="generateQRCode()">QRコードを生成</button>
+    <button onclick="generateQR()">Generate QR Code</button>
     <div id="qrcode"></div>
-    <button id="downloadBtn" style="display:none;" onclick="downloadQRCode()">QRコードをダウンロード</button>
-
-    <div class="note">
-      入力内容は外部に送信されません。<br>安全にご利用いただけます。
-    </div>
   </div>
 
-  <script>
-    function generateQRCode() {
-      const text = document.getElementById('textInput').value.trim();
-      const container = document.getElementById('qrcode');
-      const downloadBtn = document.getElementById('downloadBtn');
+  <div class="sidebar">
+    <p>💡 対応ファイル形式：.txt / .csv / 画像 (Base64)</p>
+    <p>🛡️ 入力データは外部に送信されません</p>
+    <p>🔗 Google Docs などの共有URLも対応</p>
+  </div>
 
-      container.innerHTML = '';
-      downloadBtn.style.display = 'none';
+  <footer>
+    &copy; 2025 QR App by osukakun ｜ All rights reserved.
+  </footer>
+
+  <script>
+    function generateQR() {
+      const text = document.getElementById('textInput').value.trim();
+      const qrcodeContainer = document.getElementById('qrcode');
+      qrcodeContainer.innerHTML = "";
 
       if (text) {
-        const canvas = document.createElement('canvas');
-        QRCode.toCanvas(canvas, text, { width: 256 }, function (err) {
-          if (!err) {
-            container.appendChild(canvas);
-            downloadBtn.style.display = 'inline-block';
-          }
+        QRCode.toCanvas(document.createElement('canvas'), text, { width: 256 }, function (err, canvas) {
+          if (!err) qrcodeContainer.appendChild(canvas);
         });
       } else {
         alert("テキストを入力するか、ファイルを選択してください。");
       }
-    }
-
-    function downloadQRCode() {
-      const canvas = document.querySelector('#qrcode canvas');
-      if (!canvas) return;
-      const link = document.createElement('a');
-      link.href = canvas.toDataURL('image/png');
-      link.download = 'qrcode.png';
-      link.click();
     }
 
     document.getElementById('fileInput').addEventListener('change', function(event) {
@@ -116,18 +128,19 @@
       reader.onload = function(e) {
         const result = e.target.result;
         document.getElementById('textInput').value = result;
-        generateQRCode();
+        generateQR();
       };
 
       if (file.type.startsWith('text') || file.name.endsWith('.csv')) {
         reader.readAsText(file);
-      } else if (file.type.startsWith('image/')) {
+      } else if (file.type.startsWith('image')) {
         reader.readAsDataURL(file);
       } else {
-        alert('このファイル形式には対応していません。TXT, CSV, 画像のみ対応しています。');
+        alert('このファイル形式には対応していません。TXT、CSV、画像のみ対応しています。');
       }
     });
   </script>
 </body>
 </html>
+
 
