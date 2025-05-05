@@ -78,6 +78,29 @@
       color: #555;
     }
 
+    #shareButtons {
+      margin-top: 20px;
+      display: none;
+    }
+
+    #shareButtons button {
+      margin: 5px;
+      padding: 10px 15px;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      color: white;
+    }
+
+    #shareButtons button:first-child {
+      background-color: #1da1f2; /* X */
+    }
+
+    #shareButtons button:last-child {
+      background-color: #06c755; /* LINE */
+    }
+
     footer {
       margin-top: 40px;
       font-size: 0.8rem;
@@ -91,8 +114,13 @@
   <div class="container">
     <input type="text" id="textInput" placeholder="テキストまたはURLを入力してください" />
     <input type="file" id="fileInput" />
-    <button onclick="generateQR()">Generate QR Code</button>
+    <button onclick="generateQR()">QRコードを生成</button>
     <div id="qrcode"></div>
+
+    <div id="shareButtons">
+      <button onclick="shareToX()">Xで共有</button>
+      <button onclick="shareToLINE()">LINEで送信</button>
+    </div>
   </div>
 
   <div class="sidebar">
@@ -115,9 +143,22 @@
         QRCode.toCanvas(document.createElement('canvas'), text, { width: 256 }, function (err, canvas) {
           if (!err) qrcodeContainer.appendChild(canvas);
         });
+        document.getElementById('shareButtons').style.display = "block";
       } else {
         alert("テキストを入力するか、ファイルを選択してください。");
       }
+    }
+
+    function shareToX() {
+      const text = encodeURIComponent(document.getElementById('textInput').value.trim());
+      const url = `https://twitter.com/intent/tweet?text=QRコードを作成しました！%0A${text}`;
+      window.open(url, '_blank');
+    }
+
+    function shareToLINE() {
+      const text = encodeURIComponent(document.getElementById('textInput').value.trim());
+      const url = `https://social-plugins.line.me/lineit/share?url=${text}`;
+      window.open(url, '_blank');
     }
 
     document.getElementById('fileInput').addEventListener('change', function(event) {
@@ -142,5 +183,6 @@
   </script>
 </body>
 </html>
+
 
 
