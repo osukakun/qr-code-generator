@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QRコード生成アプリ</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    .container {
+      max-width: 600px;
+      background: #fff;
+      padding: 20px;
+      margin: 0 auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    input[type=\"text\"], input[type=\"file\"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    #qrcode {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .note {
+      font-size: 0.9rem;
+      margin-top: 20px;
+      color: #666;
+      line-height: 1.5;
+    }
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 0.8rem;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>QRコード生成アプリ</h1>
+
+    <input type="text" id="textInput" placeholder="テキストやURLを入力してください" />
+    <input type="file" id="fileInput" />
+    <button onclick="generateQRCode()">QRコードを生成</button>
+
+    <div id="qrcode"></div>
+
+    <div class="note">
+      ※ 本アプリはローカルで動作しており、アップロードされたファイルや入力されたデータは外部に送信されません。<br>
+      ※ テキストファイル・画像（Base64）・CSV形式に対応しています。<br>
+      ※ Googleドキュメントなどの共有リンクもQRコード化できます。<br>
+      ※ QRコードは内容が長いと読み取りづらくなる場合があります。
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 QR Generator App by You. All rights reserved.
+  </footer>
+
+  <script>
+    function generateQRCode() {
+      const text = document.getElementById('textInput').value.trim();
+      const qrcodeContainer = document.getElementById('qrcode');
+      qrcodeContainer.innerHTML = '';
+      if (text) {
+        QRCode.toCanvas(document.createElement('canvas'), text, function (err, canvas) {
+          if (!err) qrcodeContainer.appendChild(canvas);
+        });
+      } else {
+        alert(\"テキストを入力するか、ファイルを選択してください。\");
+      }
+    }
+
+    document.getElementById('fileInput').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const result = e.target.result;
+        document.getElementById('textInput').value = result;
+        generateQRCode();
+      };
+
+      if (file.type.startsWith('text') || file.name.endsWith('.csv')) {
+        reader.readAsText(file);
+      } else if (file.type.startsWith('image/')) {
+        reader.readAsDataURL(file);
+      } else {
+        alert('このファイル形式には対応していません。TXT, CSV, 画像のみ対応しています。');
+      }
+    });
+  </script>
+</body>
+</html>
+
