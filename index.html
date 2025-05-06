@@ -14,6 +14,11 @@
       padding: 20px;
       background: linear-gradient(135deg, #e0f7fa, #f1f8e9);
       color: #333;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.dark {
+      background: #121212;
+      color: #e0e0e0;
     }
     .container {
       max-width: 600px;
@@ -22,6 +27,9 @@
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    body.dark .container {
+      background: #1e1e1e;
     }
     h1 {
       text-align: center;
@@ -44,6 +52,9 @@
     }
     .file-name {
       color: #555;
+    }
+    body.dark .file-name {
+      color: #ccc;
     }
     input[type="file"] {
       display: none;
@@ -79,6 +90,9 @@
       color: #666;
       line-height: 1.5;
     }
+    body.dark .note {
+      color: #aaa;
+    }
     footer {
       text-align: center;
       margin-top: 40px;
@@ -106,7 +120,11 @@
     <button onclick="generateQRCode()" id="generateBtn">QRコードを生成</button>
     <button onclick="downloadQRCode()" id="downloadBtn">QRコードをダウンロード</button>
     <button onclick="toggleTheme()">ライト／ダーク切り替え</button>
-    <button onclick="switchLanguage()" id="languageBtn">日本語</button>
+    <select id="languageSelect" onchange="switchLanguage(this.value)">
+      <option value="ja">日本語</option>
+      <option value="zh">中文</option>
+      <option value="es">Español</option>
+    </select>
     <div id="qrcode"></div>
 
     <div class="note" id="note">
@@ -156,12 +174,9 @@
 
     let currentLang = 'ja';
 
-    function switchLanguage() {
-      const langs = Object.keys(translations);
-      const idx = langs.indexOf(currentLang);
-      currentLang = langs[(idx + 1) % langs.length];
-      const t = translations[currentLang];
-
+    function switchLanguage(lang) {
+      currentLang = lang;
+      const t = translations[lang];
       document.getElementById('app-title').innerText = t.title;
       document.getElementById('textInput').placeholder = t.placeholder;
       document.getElementById('fileLabel').innerText = t.fileLabel;
@@ -179,8 +194,6 @@
         opt.textContent = label;
         sizeSelect.appendChild(opt);
       });
-
-      document.getElementById('languageBtn').innerText = currentLang === 'ja' ? '日本語' : currentLang === 'zh' ? '中文' : 'Español';
     }
 
     document.getElementById('fileInput').addEventListener('change', (event) => {
@@ -250,7 +263,7 @@
       document.body.classList.toggle('dark');
     }
 
-    switchLanguage();
+    switchLanguage('ja');
   </script>
 </body>
 </html>
