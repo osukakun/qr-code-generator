@@ -160,9 +160,9 @@
     <div id="qrcode"></div>
   </div>
   <div class="sidebar" id="sidebarText">
-    <p>✨ 対応形式: .txt / .csv / Excel (.xlsx のみ対応)</p>
-    <p>⛑ 入力データは外部に送信されません</p>
-    <p>🔗 Google Docs などの共有URLも対応</p>
+    <p id="formatNote">✨ 対応形式: .txt / .csv / Excel (.xlsx のみ対応)</p>
+    <p id="privacyNote">⛑ 入力データは外部に送信されません</p>
+    <p id="googleNote">🔗 Google Docs などの共有URLも対応</p>
   </div>
   <footer>
     &copy; 2025 QR App by osukakun ｜ All rights reserved。
@@ -173,10 +173,34 @@
     const fileNameDisplay = document.getElementById("fileNameDisplay");
 
     const translations = {
-      ja: { fileLabel: "ファイルを選択", fileNone: "選択されていません" },
-      en: { fileLabel: "Choose File", fileNone: "No file selected" },
-      zh: { fileLabel: "选择文件", fileNone: "未选择文件" },
-      es: { fileLabel: "Seleccionar archivo", fileNone: "Ningún archivo seleccionado" }
+      ja: {
+        fileLabel: "ファイルを選択",
+        fileNone: "選択されていません",
+        formatNote: "✨ 対応形式: .txt / .csv / Excel (.xlsx のみ対応)",
+        privacyNote: "⛑ 入力データは外部に送信されません",
+        googleNote: "🔗 Google Docs などの共有URLも対応"
+      },
+      en: {
+        fileLabel: "Choose File",
+        fileNone: "No file selected",
+        formatNote: "✨ Supported formats: .txt / .csv / Excel (.xlsx only)",
+        privacyNote: "⛑ Your input data is not sent externally",
+        googleNote: "🔗 Google Docs shared URLs are also supported"
+      },
+      zh: {
+        fileLabel: "选择文件",
+        fileNone: "未选择文件",
+        formatNote: "✨ 支持格式：.txt / .csv / Excel（仅限 .xlsx）",
+        privacyNote: "⛑ 输入数据不会发送到外部",
+        googleNote: "🔗 支持 Google Docs 等共享链接"
+      },
+      es: {
+        fileLabel: "Seleccionar archivo",
+        fileNone: "Ningún archivo seleccionado",
+        formatNote: "✨ Formatos compatibles: .txt / .csv / Excel (solo .xlsx)",
+        privacyNote: "⛑ Los datos no se envían al exterior",
+        googleNote: "🔗 También se admiten URL compartidas de Google Docs"
+      }
     };
 
     let currentLang = 'ja';
@@ -186,6 +210,9 @@
       const t = translations[lang];
       fileLabel.textContent = t.fileLabel;
       if (!fileInput.files.length) fileNameDisplay.textContent = t.fileNone;
+      document.getElementById("formatNote").textContent = t.formatNote;
+      document.getElementById("privacyNote").textContent = t.privacyNote;
+      document.getElementById("googleNote").textContent = t.googleNote;
     }
 
     fileInput.addEventListener('change', () => {
