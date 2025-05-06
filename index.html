@@ -51,7 +51,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       text-align: center;
     }
-    input[type="text"], input[type="file"], select {
+    input[type="text"], select {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -61,13 +61,14 @@
       background-color: var(--input-bg);
       color: var(--input-color);
     }
-    input[type="file"]::file-selector-button {
+    input[type="file"] {
+      width: 100%;
+      margin: 10px 0;
       color: var(--input-color);
       background-color: var(--input-bg);
+      padding: 12px;
       border: 1px solid #ccc;
-      border-radius: 4px;
-      padding: 5px 10px;
-      cursor: pointer;
+      border-radius: 6px;
     }
     button, #languageSelect {
       width: 100%;
@@ -158,7 +159,6 @@
   </footer>
   <script>
     const qrCanvas = document.getElementById("qrCanvas");
-    const ctx = qrCanvas.getContext("2d");
 
     const translations = {
       ja: {
@@ -168,7 +168,9 @@
         toggle: "ライト／ダーク切り替え",
         sample: "サンプルQRを生成",
         placeholder: "テキストまたはURLを入力してください",
-        history: "履歴"
+        history: "履歴",
+        file: "ファイルを選択",
+        sizes: ["小", "中", "大"]
       },
       en: {
         title: "QR Code Generator",
@@ -177,7 +179,9 @@
         toggle: "Toggle Light/Dark",
         sample: "Generate Sample QR",
         placeholder: "Enter text or URL",
-        history: "History"
+        history: "History",
+        file: "Choose File",
+        sizes: ["Small", "Medium", "Large"]
       },
       zh: {
         title: "二维码生成器",
@@ -186,7 +190,9 @@
         toggle: "切换明暗模式",
         sample: "生成示例二维码",
         placeholder: "请输入文本或网址",
-        history: "历史记录"
+        history: "历史记录",
+        file: "选择文件",
+        sizes: ["小", "中", "大"]
       },
       es: {
         title: "Generador de Códigos QR",
@@ -195,7 +201,9 @@
         toggle: "Cambiar Claro/Oscuro",
         sample: "Generar QR de ejemplo",
         placeholder: "Ingrese texto o URL",
-        history: "Historial"
+        history: "Historial",
+        file: "Seleccionar archivo",
+        sizes: ["Pequeño", "Medio", "Grande"]
       }
     };
 
@@ -214,8 +222,14 @@
       document.querySelector('button[onclick="toggleTheme()"]').textContent = t.toggle;
       document.querySelector('button[onclick="generateSampleQR()"]').textContent = t.sample;
       document.getElementById('textInput').placeholder = t.placeholder;
+
       const h = document.getElementById('history');
       if (h.querySelector('h3')) h.querySelector('h3').textContent = t.history;
+
+      const sizeOptions = document.getElementById('qrSize').options;
+      t.sizes.forEach((label, index) => {
+        sizeOptions[index].textContent = label;
+      });
     }
 
     function generateQR(inputText) {
@@ -278,3 +292,4 @@
   </script>
 </body>
 </html>
+
