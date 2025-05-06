@@ -86,7 +86,7 @@
     <div id="qrcode"></div>
   </div>
   <div class="sidebar">
-    <p>✨ 対応形式: .txt / .csv / 画像 (Base64) / Excel (.xlsx)</p>
+    <p>✨ 対応形式: .txt / .csv / 画像 (Base64) / Excel (.xlsx のみ対応)</p>
     <p>⛨️ 入力データは外部に送信されません</p>
     <p>🔗 Google Docs などの共有URLも対応</p>
   </div>
@@ -108,7 +108,12 @@
         const reader = new FileReader();
         reader.onload = function(e) {
           if (file.type.startsWith('image')) {
-            generateQRfromData(e.target.result);
+            const dataURL = e.target.result;
+            const canvas = document.createElement('canvas');
+            QRCode.toCanvas(canvas, dataURL, { width: 256 }, function (err) {
+              if (!err) qrcodeContainer.appendChild(canvas);
+              else alert("QRコードの生成に失敗しました。");
+            });
           } else if (file.type.startsWith('text') || file.name.endsWith('.csv')) {
             const result = e.target.result;
             document.getElementById('textInput').value = result;
@@ -125,7 +130,7 @@
               alert('Excelファイルに読み取れるデータが見つかりません。');
             }
           } else {
-            alert('このファイル形式には対応していません。TXT、CSV、画像、Excelのみ対応しています。');
+            alert('このファイル形式には対応していません。TXT、CSV、画像、Excel（.xlsx） のみ対応しています。');
           }
         };
 
@@ -141,14 +146,6 @@
       } else {
         alert("テキストを入力するか、ファイルを選択してください。");
       }
-    }
-
-    function generateQRfromData(dataURL) {
-      const qrcodeContainer = document.getElementById('qrcode');
-      qrcodeContainer.innerHTML = "";
-      QRCode.toCanvas(document.createElement('canvas'), dataURL, { width: 256 }, function (err, canvas) {
-        if (!err) qrcodeContainer.appendChild(canvas);
-      });
     }
   </script>
 </body>
