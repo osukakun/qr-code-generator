@@ -132,6 +132,7 @@
     <button onclick="generateQR()">QRコードを生成</button>
     <button onclick="downloadQR()">QRコードをダウンロード</button>
     <button onclick="toggleTheme()">ライト／ダーク切り替え</button>
+    <button onclick="toggleLanguage()">🌐 言語切り替え</button>
     <button onclick="generateSampleQR()">サンプルQRを生成</button>
     <div id="qrcode"></div>
     <div class="preview-container">
@@ -141,7 +142,7 @@
   </div>
   <div class="sidebar">
     <p>✨ 対応形式: .txt / .csv / Excel (.xlsx のみ対応)</p>
-    <p>⛨️ 入力データは外部に送信されません</p>
+    <p>⛑ 入力データは外部に送信されません</p>
     <p>🔗 Google Docs などの共有URLも対応</p>
   </div>
   <footer>
@@ -150,6 +151,66 @@
   <script>
     const qrCanvas = document.getElementById("qrCanvas");
     const ctx = qrCanvas.getContext("2d");
+
+    const translations = {
+      ja: {
+        title: "QRコード生成アプリ",
+        generate: "QRコードを生成",
+        download: "QRコードをダウンロード",
+        toggle: "ライト／ダーク切り替え",
+        language: "🌐 言語切り替え",
+        sample: "サンプルQRを生成",
+        placeholder: "テキストまたはURLを入力してください",
+        history: "履歴"
+      },
+      en: {
+        title: "QR Code Generator",
+        generate: "Generate QR Code",
+        download: "Download QR Code",
+        toggle: "Toggle Light/Dark",
+        language: "🌐 Toggle Language",
+        sample: "Generate Sample QR",
+        placeholder: "Enter text or URL",
+        history: "History"
+      },
+      zh: {
+        title: "二维码生成器",
+        generate: "生成二维码",
+        download: "下载二维码",
+        toggle: "切换明暗模式",
+        language: "🌐 切换语言",
+        sample: "生成示例二维码",
+        placeholder: "请输入文本或网址",
+        history: "历史记录"
+      },
+      es: {
+        title: "Generador de Códigos QR",
+        generate: "Generar Código QR",
+        download: "Descargar Código QR",
+        toggle: "Cambiar Claro/Oscuro",
+        language: "🌐 Cambiar idioma",
+        sample: "Generar QR de ejemplo",
+        placeholder: "Ingrese texto o URL",
+        history: "Historial"
+      }
+    };
+    let currentLang = 'ja';
+
+    function toggleLanguage() {
+      const keys = Object.keys(translations);
+      const index = (keys.indexOf(currentLang) + 1) % keys.length;
+      currentLang = keys[index];
+      const t = translations[currentLang];
+      document.querySelector('.logo').textContent = t.title;
+      document.querySelector('button[onclick="generateQR()"]').textContent = t.generate;
+      document.querySelector('button[onclick="downloadQR()"]').textContent = t.download;
+      document.querySelector('button[onclick="toggleTheme()"]').textContent = t.toggle;
+      document.querySelector('button[onclick="toggleLanguage()"]').textContent = t.language;
+      document.querySelector('button[onclick="generateSampleQR()"]').textContent = t.sample;
+      document.getElementById('textInput').placeholder = t.placeholder;
+      const h = document.getElementById('history');
+      if (h.querySelector('h3')) h.querySelector('h3').textContent = t.history;
+    }
 
     function generateQR(inputText) {
       const text = inputText || document.getElementById('textInput').value.trim();
@@ -202,7 +263,8 @@
     function renderHistory() {
       const history = JSON.parse(localStorage.getItem('qrHistory') || '[]');
       const container = document.getElementById('history');
-      container.innerHTML = '<h3>履歴</h3>' + history.map(item => `<div class="history-item" onclick="generateQR('${item}')">${item}</div>`).join('');
+      const label = translations[currentLang].history || '履歴';
+      container.innerHTML = '<h3>' + label + '</h3>' + history.map(item => `<div class="history-item" onclick="generateQR('${item}')">${item}</div>`).join('');
     }
 
     renderHistory();
