@@ -120,6 +120,15 @@
       }
     }
 
+    function generateQRfromData(dataURL) {
+      const qrcodeContainer = document.getElementById('qrcode');
+      qrcodeContainer.innerHTML = "";
+
+      QRCode.toCanvas(document.createElement('canvas'), dataURL, { width: 256 }, function (err, canvas) {
+        if (!err) qrcodeContainer.appendChild(canvas);
+      });
+    }
+
     document.getElementById('fileInput').addEventListener('change', function(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -127,21 +136,27 @@
       const reader = new FileReader();
       reader.onload = function(e) {
         const result = e.target.result;
-        document.getElementById('textInput').value = result;
-        generateQR();
+
+        if (file.type.startsWith('text') || file.name.endsWith('.csv')) {
+          document.getElementById('textInput').value = result;
+          generateQR();
+        } else if (file.type.startsWith('image')) {
+          generateQRfromData(result); // ← テキストには入れずにQR化！
+        } else {
+          alert('このファイル形式には対応していません。TXT、CSV、画像のみ対応しています。');
+        }
       };
 
       if (file.type.startsWith('text') || file.name.endsWith('.csv')) {
         reader.readAsText(file);
       } else if (file.type.startsWith('image')) {
         reader.readAsDataURL(file);
-      } else {
-        alert('このファイル形式には対応していません。TXT、CSV、画像のみ対応しています。');
       }
     });
   </script>
 </body>
 </html>
+
 
 
 
