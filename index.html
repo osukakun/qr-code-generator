@@ -132,7 +132,12 @@
     <button onclick="generateQR()">QRコードを生成</button>
     <button onclick="downloadQR()">QRコードをダウンロード</button>
     <button onclick="toggleTheme()">ライト／ダーク切り替え</button>
-    <button onclick="toggleLanguage()">🌐 言語切り替え</button>
+    <select id="languageSelect" onchange="setLanguage(this.value)">
+      <option value="ja">日本語</option>
+      <option value="en">English</option>
+      <option value="zh">中文</option>
+      <option value="es">Español</option>
+    </select>
     <button onclick="generateSampleQR()">サンプルQRを生成</button>
     <div id="qrcode"></div>
     <div class="preview-container">
@@ -158,7 +163,6 @@
         generate: "QRコードを生成",
         download: "QRコードをダウンロード",
         toggle: "ライト／ダーク切り替え",
-        language: "🌐 言語切り替え",
         sample: "サンプルQRを生成",
         placeholder: "テキストまたはURLを入力してください",
         history: "履歴"
@@ -168,7 +172,6 @@
         generate: "Generate QR Code",
         download: "Download QR Code",
         toggle: "Toggle Light/Dark",
-        language: "🌐 Toggle Language",
         sample: "Generate Sample QR",
         placeholder: "Enter text or URL",
         history: "History"
@@ -178,7 +181,6 @@
         generate: "生成二维码",
         download: "下载二维码",
         toggle: "切换明暗模式",
-        language: "🌐 切换语言",
         sample: "生成示例二维码",
         placeholder: "请输入文本或网址",
         history: "历史记录"
@@ -188,24 +190,25 @@
         generate: "Generar Código QR",
         download: "Descargar Código QR",
         toggle: "Cambiar Claro/Oscuro",
-        language: "🌐 Cambiar idioma",
         sample: "Generar QR de ejemplo",
         placeholder: "Ingrese texto o URL",
         history: "Historial"
       }
     };
-    let currentLang = 'ja';
 
-    function toggleLanguage() {
-      const keys = Object.keys(translations);
-      const index = (keys.indexOf(currentLang) + 1) % keys.length;
-      currentLang = keys[index];
+    let currentLang = navigator.language.startsWith('ja') ? 'ja' :
+                      navigator.language.startsWith('zh') ? 'zh' :
+                      navigator.language.startsWith('es') ? 'es' : 'en';
+
+    document.getElementById('languageSelect').value = currentLang;
+
+    function setLanguage(lang) {
+      currentLang = lang;
       const t = translations[currentLang];
       document.querySelector('.logo').textContent = t.title;
       document.querySelector('button[onclick="generateQR()"]').textContent = t.generate;
       document.querySelector('button[onclick="downloadQR()"]').textContent = t.download;
       document.querySelector('button[onclick="toggleTheme()"]').textContent = t.toggle;
-      document.querySelector('button[onclick="toggleLanguage()"]').textContent = t.language;
       document.querySelector('button[onclick="generateSampleQR()"]').textContent = t.sample;
       document.getElementById('textInput').placeholder = t.placeholder;
       const h = document.getElementById('history');
@@ -267,6 +270,7 @@
       container.innerHTML = '<h3>' + label + '</h3>' + history.map(item => `<div class="history-item" onclick="generateQR('${item}')">${item}</div>`).join('');
     }
 
+    setLanguage(currentLang);
     renderHistory();
   </script>
 </body>
