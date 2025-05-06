@@ -66,9 +66,22 @@
       margin: 10px 0 4px;
       font-size: 0.95rem;
     }
-    input[type="file"] {
-      width: 100%;
+    .file-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
       margin: 5px 0 15px;
+    }
+    #fileInput {
+      flex: 1;
+    }
+    #fileStatus {
+      flex: 1;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+    input[type="file"] {
       color: var(--input-color);
       background-color: var(--input-bg);
       padding: 10px;
@@ -133,8 +146,10 @@
   <div class="container">
     <input type="text" id="textInput" placeholder="テキストまたはURLを入力してください" />
     <label id="fileLabel" for="fileInput">ファイルを選択</label>
-    <input type="file" id="fileInput" />
-    <div id="fileNameDisplay">選択されていません</div>
+    <div class="file-wrapper">
+      <input type="file" id="fileInput" />
+      <div id="fileStatus">選択されていません</div>
+    </div>
     <select id="qrSize">
       <option value="128">小</option>
       <option value="256" selected>中</option>
@@ -156,16 +171,15 @@
     </div>
     <div id="history"></div>
   </div>
-  <div class="sidebar" id="sidebarText">
-    <p>✨ 対応形式: .txt / .csv / Excel (.xlsx のみ対応)</p>
-    <p>⛑ 入力データは外部に送信されません</p>
-    <p>🔗 Google Docs などの共有URLも対応</p>
-  </div>
+  <div class="sidebar" id="sidebarText"></div>
   <footer>
     &copy; 2025 QR App by osukakun ｜ All rights reserved。
   </footer>
   <script>
     const qrCanvas = document.getElementById("qrCanvas");
+    const fileInput = document.getElementById("fileInput");
+    const fileLabel = document.getElementById("fileLabel");
+    const fileStatus = document.getElementById("fileStatus");
 
     const translations = {
       ja: {
@@ -255,23 +269,21 @@
       document.getElementById('textInput').placeholder = t.placeholder;
       const h = document.getElementById('history');
       if (h.querySelector('h3')) h.querySelector('h3').textContent = t.history;
-      document.getElementById('fileLabel').textContent = t.fileLabel;
-      document.getElementById('fileNameDisplay').textContent = t.fileNone;
+      fileLabel.textContent = t.fileLabel;
+      fileStatus.textContent = t.fileNone;
       const sizeOptions = document.getElementById('qrSize').options;
       t.sizes.forEach((label, index) => {
         sizeOptions[index].textContent = label;
       });
-      const sidebar = document.getElementById('sidebarText');
-      sidebar.innerHTML = t.sidebar.map(line => `<p>${line}</p>`).join('');
+      document.getElementById('sidebarText').innerHTML = t.sidebar.map(line => `<p>${line}</p>`).join('');
     }
 
-    document.getElementById('fileInput').addEventListener('change', function () {
+    fileInput.addEventListener('change', function () {
       const file = this.files[0];
-      const display = document.getElementById('fileNameDisplay');
       if (file) {
-        display.textContent = file.name;
+        fileStatus.textContent = file.name;
       } else {
-        display.textContent = translations[currentLang].fileNone;
+        fileStatus.textContent = translations[currentLang].fileNone;
       }
     });
 
