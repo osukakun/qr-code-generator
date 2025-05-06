@@ -217,7 +217,20 @@
 
     fileInput.addEventListener('change', () => {
       const file = fileInput.files[0];
-      fileNameDisplay.textContent = file ? file.name : translations[currentLang].fileNone;
+      if (!file) return fileNameDisplay.textContent = translations[currentLang].fileNone;
+
+      fileNameDisplay.textContent = file.name;
+      const reader = new FileReader();
+      if (file.name.endsWith('.xlsx')) {
+        reader.onload = function(e) {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const csv = XLSX.utils.sheet_to_csv(firstSheet);
+          document.getElementById("textInput").value = csv;
+        };
+        reader.readAsArrayBuffer(file);
+      }
     });
 
     function generateQR() {
