@@ -76,6 +76,7 @@
       border: none;
       border-radius: 6px;
       cursor: pointer;
+      text-align: center;
     }
     button:hover {
       background-color: #0288d1;
@@ -122,6 +123,7 @@
     <button onclick="toggleTheme()">ライト／ダーク切り替え</button>
     <select id="languageSelect" onchange="switchLanguage(this.value)">
       <option value="ja">日本語</option>
+      <option value="en">English</option>
       <option value="zh">中文</option>
       <option value="es">Español</option>
     </select>
@@ -149,6 +151,16 @@
         downloadBtn: 'QRコードをダウンロード',
         sizeOptions: ['小', '中', '大'],
         note: '✨ 対応形式：.txt / .csv / 画像（Base64）/ Excel（.xlsx のみ対応）<br>🛡️ 入力データは外部に送信されません<br>🔗 Google Docs などの共有URLも対応'
+      },
+      en: {
+        title: 'QR Code Generator',
+        placeholder: 'Enter text or URL',
+        fileLabel: 'Choose File',
+        noFile: 'No file selected',
+        generateBtn: 'Generate QR Code',
+        downloadBtn: 'Download QR Code',
+        sizeOptions: ['Small', 'Medium', 'Large'],
+        note: '✨ Supported formats: .txt / .csv / image (Base64) / Excel (.xlsx only)<br>🛡️ Your input data is not sent externally<br>🔗 Google Docs shared URLs are also supported'
       },
       zh: {
         title: 'QR码生成器',
@@ -267,4 +279,5 @@
   </script>
 </body>
 </html>
+
 
