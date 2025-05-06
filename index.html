@@ -24,12 +24,16 @@
       --text-color: #333333;
       --input-bg: #ffffff;
       --input-color: #000000;
+      --button-bg: #3498db;
+      --button-hover: #2980b9;
     }
     .dark {
       --bg-color: #1e1e1e;
       --text-color: #f0f0f0;
       --input-bg: #2c2c2c;
       --input-color: #ffffff;
+      --button-bg: #2980b9;
+      --button-hover: #1c6ea4;
     }
     .logo {
       font-size: 2.5rem;
@@ -41,7 +45,7 @@
     .container {
       width: 100%;
       max-width: 600px;
-      background: #fff;
+      background: var(--input-bg);
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -59,20 +63,25 @@
     }
     input[type="file"]::file-selector-button {
       color: var(--input-color);
+      background-color: var(--input-bg);
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 5px 10px;
+      cursor: pointer;
     }
     button {
       width: 100%;
       padding: 12px;
-      background-color: #3498db;
+      background-color: var(--button-bg);
       color: white;
       border: none;
       border-radius: 6px;
       font-size: 1rem;
       cursor: pointer;
-      transition: transform 0.2s ease-in-out;
+      transition: transform 0.2s ease-in-out, background-color 0.3s;
     }
     button:hover {
-      background-color: #2980b9;
+      background-color: var(--button-hover);
       transform: scale(1.02);
     }
     #qrcode {
