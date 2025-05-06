@@ -51,7 +51,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       text-align: center;
     }
-    input[type="text"], select {
+    select {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -137,7 +137,6 @@
 <body>
   <h1 class="logo">QRコード生成アプリ</h1>
   <div class="container">
-    <input type="text" id="textInput" placeholder="テキストまたはURLを入力してください" />
     <div class="custom-file">
       <label id="fileLabel" for="fileInput">ファイルを選択</label>
       <input type="file" id="fileInput" />
@@ -171,6 +170,7 @@
     const fileInput = document.getElementById("fileInput");
     const fileLabel = document.getElementById("fileLabel");
     const fileNameDisplay = document.getElementById("fileNameDisplay");
+    const qrcode = document.getElementById("qrcode");
 
     const translations = {
       ja: {
@@ -204,6 +204,7 @@
     };
 
     let currentLang = 'ja';
+    let currentQRData = '';
 
     function setLanguage(lang) {
       currentLang = lang;
@@ -226,22 +227,23 @@
           const data = new Uint8Array(e.target.result);
           const workbook = XLSX.read(data, { type: 'array' });
           const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-          const csv = XLSX.utils.sheet_to_json(firstSheet, { header: 1 })
-            .map(row => row.join(',')).join('\n');
-          document.getElementById("textInput").value = csv;
+          const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+          const cleanData = rows
+            .filter(row => row.some(cell => cell !== undefined && cell !== ''))
+            .map(row => row.map(cell => cell === undefined ? '' : String(cell).trim()).join(',')).join('\n');
+          currentQRData = cleanData;
         };
         reader.readAsArrayBuffer(file);
       }
     });
 
     function generateQR() {
-      const text = document.getElementById("textInput").value.trim();
-      if (!text) return alert("テキストを入力してください。");
+      if (!currentQRData) return alert("テキストを入力してください。");
       const size = parseInt(document.getElementById("qrSize").value);
-      const qrcode = document.getElementById("qrcode");
       qrcode.innerHTML = "";
-      QRCode.toCanvas(text, { width: size }, (err, canvas) => {
+      QRCode.toCanvas(currentQRData, { width: size }, (err, canvas) => {
         if (!err) qrcode.appendChild(canvas);
+        else alert("QRコードの生成に失敗しました。");
       });
     }
 
