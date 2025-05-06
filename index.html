@@ -86,7 +86,7 @@
     <div id="qrcode"></div>
   </div>
   <div class="sidebar">
-    <p>✨ 対応形式: .txt / .csv / 画像 (Base64) / Excel (.xlsx のみ対応)</p>
+    <p>✨ 対応形式: .txt / .csv / 画像 (Base64 小さいファイルのみ対応、直接表示非接続) / Excel (.xlsx のみ対応)</p>
     <p>⛨️ 入力データは外部に送信されません</p>
     <p>🔗 Google Docs などの共有URLも対応</p>
   </div>
@@ -109,6 +109,10 @@
         reader.onload = function(e) {
           if (file.type.startsWith('image')) {
             const dataURL = e.target.result;
+            if (dataURL.length > 2000) {
+              alert("画像ファイルが大きすぎるためQRコードに変換できません。容量を小さくしてください。");
+              return;
+            }
             const canvas = document.createElement('canvas');
             QRCode.toCanvas(canvas, dataURL, { width: 256 }, function (err) {
               if (!err) qrcodeContainer.appendChild(canvas);
@@ -122,7 +126,17 @@
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, { type: 'array' });
             const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-            const firstValue = XLSX.utils.sheet_to_json(firstSheet, { header: 1 })[0][0];
+            const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+            let firstValue = '';
+            for (let row of rows) {
+              for (let cell of row) {
+                if (cell && cell.toString().trim()) {
+                  firstValue = cell;
+                  break;
+                }
+              }
+              if (firstValue) break;
+            }
             if (firstValue) {
               document.getElementById('textInput').value = firstValue;
               generateQR();
@@ -130,7 +144,7 @@
               alert('Excelファイルに読み取れるデータが見つかりません。');
             }
           } else {
-            alert('このファイル形式には対応していません。TXT、CSV、画像、Excel（.xlsx） のみ対応しています。');
+            alert('このファイル形式には対応していません。TXT、CSV、画像（小容量）、Excel（.xlsx）のみ対応しています。');
           }
         };
 
