@@ -12,11 +12,20 @@
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
       padding: 40px 20px;
-      background: linear-gradient(to bottom right, #e0f7fa, #ffffff);
-      color: #333;
+      background: var(--bg-color);
+      color: var(--text-color);
       display: flex;
       flex-direction: column;
       align-items: center;
+      transition: background 0.3s, color 0.3s;
+    }
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+    }
+    .dark {
+      --bg-color: #1e1e1e;
+      --text-color: #f0f0f0;
     }
     .logo {
       font-size: 2.5rem;
@@ -34,7 +43,7 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       text-align: center;
     }
-    input[type="text"], input[type="file"] {
+    input[type="text"], input[type="file"], select {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -59,6 +68,11 @@
     }
     #qrcode {
       margin-top: 20px;
+      position: relative;
+    }
+    #qrCanvas {
+      display: block;
+      margin: 0 auto;
     }
     .sidebar {
       max-width: 600px;
@@ -75,6 +89,16 @@
       font-size: 0.8rem;
       color: #aaa;
     }
+    .history-item {
+      font-size: 0.85rem;
+      margin: 3px 0;
+      cursor: pointer;
+      color: #2980b9;
+      text-decoration: underline;
+    }
+    .preview-container {
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
@@ -82,12 +106,23 @@
   <div class="container">
     <input type="text" id="textInput" placeholder="テキストまたはURLを入力してください" />
     <input type="file" id="fileInput" />
+    <select id="qrSize">
+      <option value="128">小</option>
+      <option value="256" selected>中</option>
+      <option value="512">大</option>
+    </select>
     <button onclick="generateQR()">QRコードを生成</button>
+    <button onclick="downloadQR()">QRコードをダウンロード</button>
+    <button onclick="toggleTheme()">ライト／ダーク切り替え</button>
+    <button onclick="generateSampleQR()">サンプルQRを生成</button>
     <div id="qrcode"></div>
+    <div class="preview-container">
+      <canvas id="qrCanvas"></canvas>
+    </div>
+    <div id="history"></div>
   </div>
   <div class="sidebar">
     <p>✨ 対応形式: .txt / .csv / Excel (.xlsx のみ対応)</p>
-    <p>❌ 画像ファイルのQRコード生成は非対応です。URLをQR化する方式をご利用ください。</p>
     <p>⛨️ 入力データは外部に送信されません</p>
     <p>🔗 Google Docs などの共有URLも対応</p>
   </div>
@@ -95,63 +130,64 @@
     &copy; 2025 QR App by osukakun ｜ All rights reserved.
   </footer>
   <script>
-    function generateQR() {
-      const text = document.getElementById('textInput').value.trim();
-      const file = document.getElementById('fileInput').files[0];
+    const qrCanvas = document.getElementById("qrCanvas");
+    const ctx = qrCanvas.getContext("2d");
+
+    function generateQR(inputText) {
+      const text = inputText || document.getElementById('textInput').value.trim();
+      const size = parseInt(document.getElementById('qrSize').value);
       const qrcodeContainer = document.getElementById('qrcode');
       qrcodeContainer.innerHTML = "";
 
-      if (text) {
-        QRCode.toCanvas(document.createElement('canvas'), text, { width: 256 }, function (err, canvas) {
-          if (!err) qrcodeContainer.appendChild(canvas);
-        });
-      } else if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          if (file.type.startsWith('image')) {
-            alert("画像ファイルのQRコード生成には対応していません。URLをご利用ください。");
-            return;
-          } else if (file.type.startsWith('text') || file.name.endsWith('.csv')) {
-            const result = e.target.result;
-            document.getElementById('textInput').value = result;
-            generateQR();
-          } else if (file.name.endsWith('.xlsx')) {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-            const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-            let firstValue = '';
-            for (let row of rows) {
-              for (let cell of row) {
-                if (cell && cell.toString().trim()) {
-                  firstValue = cell;
-                  break;
-                }
-              }
-              if (firstValue) break;
-            }
-            if (firstValue) {
-              document.getElementById('textInput').value = firstValue;
-              generateQR();
-            } else {
-              alert('Excelファイルに読み取れるデータが見つかりません。');
-            }
-          } else {
-            alert('このファイル形式には対応していません。TXT、CSV、Excel（.xlsx）のみ対応しています。');
-          }
-        };
-
-        if (file.type.startsWith('text') || file.name.endsWith('.csv')) {
-          reader.readAsText(file);
-        } else if (file.name.endsWith('.xlsx')) {
-          reader.readAsArrayBuffer(file);
-        } else {
-          alert('このファイル形式には対応していません。');
-        }
-      } else {
+      if (!text) {
         alert("テキストを入力するか、ファイルを選択してください。");
+        return;
       }
+
+      QRCode.toCanvas(document.createElement('canvas'), text, { width: size }, function (err, canvas) {
+        if (!err) qrcodeContainer.appendChild(canvas);
+      });
+
+      QRCode.toCanvas(qrCanvas, text, { width: size }, function (err) {
+        if (err) alert("QRコードの生成に失敗しました。");
+      });
+
+      saveToHistory(text);
     }
+
+    function generateSampleQR() {
+      document.getElementById('textInput').value = 'https://example.com';
+      generateQR('https://example.com');
+    }
+
+    function downloadQR() {
+      const link = document.createElement('a');
+      link.download = 'qrcode.png';
+      link.href = qrCanvas.toDataURL();
+      link.click();
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+    }
+
+    function saveToHistory(text) {
+      let history = JSON.parse(localStorage.getItem('qrHistory') || '[]');
+      if (!history.includes(text)) {
+        history.unshift(text);
+        if (history.length > 5) history = history.slice(0, 5);
+        localStorage.setItem('qrHistory', JSON.stringify(history));
+      }
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const history = JSON.parse(localStorage.getItem('qrHistory') || '[]');
+      const container = document.getElementById('history');
+      container.innerHTML = '<h3>履歴</h3>' + history.map(item => `<div class="history-item" onclick="generateQR('${item}')">${item}</div>`).join('');
+    }
+
+    renderHistory();
   </script>
 </body>
 </html>
