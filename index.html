@@ -61,12 +61,17 @@
       background-color: var(--input-bg);
       color: var(--input-color);
     }
+    #fileLabel {
+      display: block;
+      margin: 10px 0 4px;
+      font-size: 0.95rem;
+    }
     input[type="file"] {
       width: 100%;
-      margin: 10px 0;
+      margin: 5px 0 15px;
       color: var(--input-color);
       background-color: var(--input-bg);
-      padding: 12px;
+      padding: 10px;
       border: 1px solid #ccc;
       border-radius: 6px;
     }
@@ -127,7 +132,9 @@
   <h1 class="logo">QRコード生成アプリ</h1>
   <div class="container">
     <input type="text" id="textInput" placeholder="テキストまたはURLを入力してください" />
+    <label id="fileLabel" for="fileInput">ファイルを選択</label>
     <input type="file" id="fileInput" />
+    <div id="fileNameDisplay">選択されていません</div>
     <select id="qrSize">
       <option value="128">小</option>
       <option value="256" selected>中</option>
@@ -149,7 +156,7 @@
     </div>
     <div id="history"></div>
   </div>
-  <div class="sidebar">
+  <div class="sidebar" id="sidebarText">
     <p>✨ 対応形式: .txt / .csv / Excel (.xlsx のみ対応)</p>
     <p>⛑ 入力データは外部に送信されません</p>
     <p>🔗 Google Docs などの共有URLも対応</p>
@@ -169,7 +176,13 @@
         sample: "サンプルQRを生成",
         placeholder: "テキストまたはURLを入力してください",
         history: "履歴",
-        file: "ファイルを選択",
+        fileLabel: "ファイルを選択",
+        fileNone: "選択されていません",
+        sidebar: [
+          "✨ 対応形式: .txt / .csv / Excel (.xlsx のみ対応)",
+          "⛑ 入力データは外部に送信されません",
+          "🔗 Google Docs などの共有URLも対応"
+        ],
         sizes: ["小", "中", "大"]
       },
       en: {
@@ -180,7 +193,13 @@
         sample: "Generate Sample QR",
         placeholder: "Enter text or URL",
         history: "History",
-        file: "Choose File",
+        fileLabel: "Choose File",
+        fileNone: "No file selected",
+        sidebar: [
+          "✨ Supported formats: .txt / .csv / Excel (.xlsx only)",
+          "⛑ Input data is not sent to any server",
+          "🔗 Shared URLs from Google Docs supported"
+        ],
         sizes: ["Small", "Medium", "Large"]
       },
       zh: {
@@ -191,7 +210,13 @@
         sample: "生成示例二维码",
         placeholder: "请输入文本或网址",
         history: "历史记录",
-        file: "选择文件",
+        fileLabel: "选择文件",
+        fileNone: "未选择文件",
+        sidebar: [
+          "✨ 支持格式: .txt / .csv / Excel (.xlsx 仅支持)",
+          "⛑ 输入数据不会被发送到服务器",
+          "🔗 支持来自 Google 文档的共享链接"
+        ],
         sizes: ["小", "中", "大"]
       },
       es: {
@@ -202,7 +227,13 @@
         sample: "Generar QR de ejemplo",
         placeholder: "Ingrese texto o URL",
         history: "Historial",
-        file: "Seleccionar archivo",
+        fileLabel: "Seleccionar archivo",
+        fileNone: "Ningún archivo seleccionado",
+        sidebar: [
+          "✨ Formatos compatibles: .txt / .csv / Excel (solo .xlsx)",
+          "⛑ Los datos no se envían a ningún servidor",
+          "🔗 Compatible con enlaces compartidos de Google Docs"
+        ],
         sizes: ["Pequeño", "Medio", "Grande"]
       }
     };
@@ -222,15 +253,27 @@
       document.querySelector('button[onclick="toggleTheme()"]').textContent = t.toggle;
       document.querySelector('button[onclick="generateSampleQR()"]').textContent = t.sample;
       document.getElementById('textInput').placeholder = t.placeholder;
-
       const h = document.getElementById('history');
       if (h.querySelector('h3')) h.querySelector('h3').textContent = t.history;
-
+      document.getElementById('fileLabel').textContent = t.fileLabel;
+      document.getElementById('fileNameDisplay').textContent = t.fileNone;
       const sizeOptions = document.getElementById('qrSize').options;
       t.sizes.forEach((label, index) => {
         sizeOptions[index].textContent = label;
       });
+      const sidebar = document.getElementById('sidebarText');
+      sidebar.innerHTML = t.sidebar.map(line => `<p>${line}</p>`).join('');
     }
+
+    document.getElementById('fileInput').addEventListener('change', function () {
+      const file = this.files[0];
+      const display = document.getElementById('fileNameDisplay');
+      if (file) {
+        display.textContent = file.name;
+      } else {
+        display.textContent = translations[currentLang].fileNone;
+      }
+    });
 
     function generateQR(inputText) {
       const text = inputText || document.getElementById('textInput').value.trim();
