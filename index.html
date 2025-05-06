@@ -1,206 +1,207 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>QRコード生成アプリ</title>
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="icon" href="favicon.png" />
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      padding: 20px;
-      background: linear-gradient(135deg, #e0f7fa, #f1f8e9);
-      color: #333;
+      padding: 40px 20px;
+      background: var(--bg-color, #f4f4f4);
+      color: var(--text-color, #333);
       transition: background 0.3s, color 0.3s;
     }
-    body.dark {
-      background: #121212;
-      color: #e0e0e0;
-    }
+
     .container {
       max-width: 600px;
-      margin: 0 auto;
+      margin: auto;
       background: #fff;
       padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-    body.dark .container {
-      background: #1e1e1e;
-    }
-    h1 {
-      text-align: center;
-      color: #00796b;
-    }
-    input[type="text"], select {
+
+    textarea, button, select {
       width: 100%;
       padding: 10px;
-      margin: 10px 0;
+      margin-top: 10px;
       border-radius: 6px;
       border: 1px solid #ccc;
       font-size: 1rem;
     }
-    select#languageSelect {
-      background-color: #03a9f4;
-      color: white;
-      border: none;
-      text-align-last: center;
-    }
+
     button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      background-color: #03a9f4;
+      background: #3498db;
       color: white;
       border: none;
-      border-radius: 6px;
       cursor: pointer;
-      text-align: center;
+      margin-top: 15px;
     }
-    button:hover, select#languageSelect:hover {
-      background-color: #0288d1;
+
+    button:hover {
+      background: #2980b9;
     }
+
+    .button-group button {
+      margin-bottom: 10px;
+    }
+
     #qrcode {
+      margin-top: 20px;
       text-align: center;
-      margin-top: 20px;
     }
-    .note {
-      font-size: 0.9rem;
-      margin-top: 20px;
-      color: #666;
-      line-height: 1.5;
-    }
-    body.dark .note {
-      color: #aaa;
-    }
+
     footer {
       text-align: center;
-      margin-top: 40px;
       font-size: 0.8rem;
+      margin-top: 40px;
       color: #aaa;
+    }
+
+    .note {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 20px;
+      line-height: 1.5;
+    }
+
+    .dark {
+      --bg-color: #121212;
+      --text-color: #f0f0f0;
+      background: var(--bg-color);
+      color: var(--text-color);
+    }
+
+    .lang-select {
+      background: #3498db;
+      color: white;
+      text-align: center;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1 id="app-title">QRコード生成アプリ</h1>
-    <input type="text" id="textInput" placeholder="テキストまたはURLを入力してください">
-    <select id="sizeSelect">
-      <option value="200">小</option>
-      <option value="300">中</option>
-      <option value="400">大</option>
-    </select>
-    <button onclick="generateQRCode()" id="generateBtn">QRコードを生成</button>
-    <button onclick="downloadQRCode()" id="downloadBtn">QRコードをダウンロード</button>
-    <button onclick="toggleTheme()">ライト／ダーク切り替え</button>
-    <select id="languageSelect" onchange="switchLanguage(this.value)">
-      <option value="ja">日本語</option>
-      <option value="en">English</option>
-      <option value="zh">中文</option>
-      <option value="es">Español</option>
-    </select>
-    <div id="qrcode"></div>
-    <div class="note" id="note">
-      ✨ 対応形式：テキストまたはURL のみ<br>
-      🛡️ 入力データは外部に送信されません<br>
-      🔗 Google Docs などの共有URLも対応
+    <h1 id="title">QRコード生成アプリ</h1>
+
+    <textarea id="textInput" placeholder="テキストまたはURLを入力してください（改行で複数対応）" rows="4"></textarea>
+
+    <div class="button-group">
+      <button onclick="generateQRCode()" id="generateBtn">QRコードを生成</button>
+      <button onclick="downloadQRCode()" id="downloadBtn">QRコードをダウンロード</button>
+      <button onclick="toggleTheme()" id="themeBtn">ライト／ダーク切り替え</button>
+      <select id="langSelect" onchange="changeLanguage()" class="lang-select">
+        <option value="ja">日本語</option>
+        <option value="en">English</option>
+        <option value="zh">中文</option>
+        <option value="es">Español</option>
+      </select>
     </div>
+
+    <div id="qrcode"></div>
+
+    <div class="note" id="note">
+      ✨ 対応形式：テキスト、URL（改行で複数入力可能）<br />
+      🔒 入力内容は外部に送信されません<br />
+    </div>
+
+    <footer>&copy; 2025 QR App by osukakun</footer>
   </div>
-  <footer>
-    &copy; 2025 QR App by osukakun | All rights reserved.
-  </footer>
+
   <script>
-    const translations = {
-      ja: {
-        title: 'QRコード生成アプリ',
-        placeholder: 'テキストまたはURLを入力してください',
-        generateBtn: 'QRコードを生成',
-        downloadBtn: 'QRコードをダウンロード',
-        sizeOptions: ['小', '中', '大'],
-        note: '✨ 対応形式：テキストまたはURL のみ<br>🛡️ 入力データは外部に送信されません<br>🔗 Google Docs などの共有URLも対応'
-      },
-      en: {
-        title: 'QR Code Generator',
-        placeholder: 'Enter text or URL',
-        generateBtn: 'Generate QR Code',
-        downloadBtn: 'Download QR Code',
-        sizeOptions: ['Small', 'Medium', 'Large'],
-        note: '✨ Supported format: Text or URL only<br>🛡️ Your input data is not sent externally<br>🔗 Google Docs shared URLs are also supported'
-      },
-      zh: {
-        title: 'QR码生成器',
-        placeholder: '请输入文本或网址',
-        generateBtn: '生成QR码',
-        downloadBtn: '下载QR码',
-        sizeOptions: ['小', '中', '大'],
-        note: '✨ 支持格式：仅限文本或网址<br>🛡️ 输入数据不会发送到外部<br>🔗 支持 Google Docs 等共享链接'
-      },
-      es: {
-        title: 'Generador de Código QR',
-        placeholder: 'Introduce texto o URL',
-        generateBtn: 'Generar Código QR',
-        downloadBtn: 'Descargar Código QR',
-        sizeOptions: ['Pequeño', 'Mediano', 'Grande'],
-        note: '✨ Formato compatible: solo texto o URL<br>🛡️ Los datos introducidos no se envían externamente<br>🔗 Compatible con enlaces compartidos como Google Docs'
-      }
-    };
-
-    let currentLang = 'ja';
-
-    function switchLanguage(lang) {
-      currentLang = lang;
-      const t = translations[lang];
-      document.getElementById('app-title').innerText = t.title;
-      document.getElementById('textInput').placeholder = t.placeholder;
-      document.getElementById('generateBtn').innerText = t.generateBtn;
-      document.getElementById('downloadBtn').innerText = t.downloadBtn;
-      document.getElementById('note').innerHTML = t.note;
-      const sizeSelect = document.getElementById('sizeSelect');
-      sizeSelect.innerHTML = '';
-      t.sizeOptions.forEach((label, i) => {
-        const val = (i + 2) * 100;
-        const opt = document.createElement('option');
-        opt.value = val;
-        opt.textContent = label;
-        sizeSelect.appendChild(opt);
-      });
-    }
-
     function generateQRCode() {
-      const text = document.getElementById('textInput').value.trim();
-      const size = parseInt(document.getElementById('sizeSelect').value);
-      const qrcodeContainer = document.getElementById('qrcode');
-      qrcodeContainer.innerHTML = '';
-      if (!text) {
-        alert('テキストを入力してください。');
-        return;
-      }
-      try {
-        QRCode.toCanvas(document.createElement('canvas'), text, { width: size }, function(err, canvas) {
-          if (err) throw err;
+      const text = document.getElementById("textInput").value.trim();
+      const qrcodeContainer = document.getElementById("qrcode");
+      qrcodeContainer.innerHTML = "";
+
+      if (text) {
+        QRCode.toCanvas(text, { errorCorrectionLevel: 'H' }, function (err, canvas) {
+          if (err) {
+            alert(currentMessages["error"]);
+            return;
+          }
+          canvas.id = "qrCanvas";
           qrcodeContainer.appendChild(canvas);
         });
-      } catch (e) {
-        alert('QRコードの生成に失敗しました。');
+      } else {
+        alert(currentMessages["empty"]);
       }
     }
 
     function downloadQRCode() {
-      const canvas = document.querySelector('#qrcode canvas');
+      const canvas = document.getElementById("qrCanvas");
       if (!canvas) return;
-      const link = document.createElement('a');
-      link.download = 'qrcode.png';
-      link.href = canvas.toDataURL();
+
+      const link = document.createElement("a");
+      link.href = canvas.toDataURL("image/png");
+      link.download = "qr_code.png";
       link.click();
     }
 
     function toggleTheme() {
-      document.body.classList.toggle('dark');
+      document.body.classList.toggle("dark");
     }
 
-    switchLanguage('ja');
+    const messages = {
+      ja: {
+        title: "QRコード生成アプリ",
+        generate: "QRコードを生成",
+        download: "QRコードをダウンロード",
+        theme: "ライト／ダーク切り替え",
+        note: "✨ 対応形式：テキスト、URL（改行で複数入力可能）<br />🔒 入力内容は外部に送信されません",
+        empty: "テキストを入力してください。",
+        error: "QRコードの生成に失敗しました。"
+      },
+      en: {
+        title: "QR Code Generator",
+        generate: "Generate QR Code",
+        download: "Download QR Code",
+        theme: "Toggle Light/Dark",
+        note: "✨ Supported: Text / URL (multiple via line breaks)<br />🔒 Input is not sent externally",
+        empty: "Please enter text.",
+        error: "Failed to generate QR code."
+      },
+      zh: {
+        title: "QR码生成器",
+        generate: "生成QR码",
+        download: "下载QR码",
+        theme: "切换明暗模式",
+        note: "✨ 支持：文本、URL（可换行）<br />🔒 输入内容不会被外部发送",
+        empty: "请输入文本。",
+        error: "QR码生成失败。"
+      },
+      es: {
+        title: "Generador de Código QR",
+        generate: "Generar Código QR",
+        download: "Descargar Código QR",
+        theme: "Cambiar claro/oscuro",
+        note: "✨ Formatos: texto y URL (múltiples por línea)<br />🔒 Los datos no se envían al exterior",
+        empty: "Por favor ingrese texto.",
+        error: "No se pudo generar el código QR."
+      }
+    };
+
+    let currentLang = "ja";
+    let currentMessages = messages[currentLang];
+
+    function changeLanguage() {
+      currentLang = document.getElementById("langSelect").value;
+      currentMessages = messages[currentLang];
+      document.getElementById("title").innerText = currentMessages.title;
+      document.getElementById("generateBtn").innerText = currentMessages.generate;
+      document.getElementById("downloadBtn").innerText = currentMessages.download;
+      document.getElementById("themeBtn").innerText = currentMessages.theme;
+      document.getElementById("note").innerHTML = currentMessages.note;
+    }
+
+    // 初期化
+    window.onload = () => {
+      changeLanguage();
+    };
   </script>
 </body>
 </html>
+
