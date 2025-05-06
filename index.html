@@ -69,7 +69,7 @@
       padding: 5px 10px;
       cursor: pointer;
     }
-    button {
+    button, #languageSelect {
       width: 100%;
       padding: 12px;
       background-color: var(--button-bg);
@@ -79,8 +79,9 @@
       font-size: 1rem;
       cursor: pointer;
       transition: transform 0.2s ease-in-out, background-color 0.3s;
+      appearance: none;
     }
-    button:hover {
+    button:hover, #languageSelect:hover {
       background-color: var(--button-hover);
       transform: scale(1.02);
     }
@@ -151,7 +152,7 @@
     <p>🔗 Google Docs などの共有URLも対応</p>
   </div>
   <footer>
-    &copy; 2025 QR App by osukakun ｜ All rights reserved.
+    &copy; 2025 QR App by osukakun ｜ All rights reserved。
   </footer>
   <script>
     const qrCanvas = document.getElementById("qrCanvas");
