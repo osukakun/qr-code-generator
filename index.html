@@ -22,10 +22,14 @@
     :root {
       --bg-color: #ffffff;
       --text-color: #333333;
+      --input-bg: #ffffff;
+      --input-color: #000000;
     }
     .dark {
       --bg-color: #1e1e1e;
       --text-color: #f0f0f0;
+      --input-bg: #2c2c2c;
+      --input-color: #ffffff;
     }
     .logo {
       font-size: 2.5rem;
@@ -50,6 +54,11 @@
       font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 6px;
+      background-color: var(--input-bg);
+      color: var(--input-color);
+    }
+    input[type="file"]::file-selector-button {
+      color: var(--input-color);
     }
     button {
       width: 100%;
