@@ -11,135 +11,76 @@
     body {
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      padding: 40px 20px;
-      background: var(--bg-color);
-      color: var(--text-color);
+      padding: 20px;
+      background: linear-gradient(135deg, #e0f7fa, #f1f8e9);
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #00796b;
+    }
+    .custom-file {
       display: flex;
       flex-direction: column;
       align-items: center;
-      transition: background 0.3s, color 0.3s;
-    }
-    :root {
-      --bg-color: #ffffff;
-      --text-color: #333333;
-      --input-bg: #ffffff;
-      --input-color: #000000;
-      --button-bg: #3498db;
-      --button-hover: #2980b9;
-    }
-    .dark {
-      --bg-color: #1e1e1e;
-      --text-color: #f0f0f0;
-      --input-bg: #2c2c2c;
-      --input-color: #ffffff;
-      --button-bg: #2980b9;
-      --button-hover: #1c6ea4;
-    }
-    .logo {
-      font-size: 2.5rem;
-      color: #2c3e50;
-      margin-bottom: 20px;
-      font-weight: bold;
-      letter-spacing: 1px;
-    }
-    .container {
-      width: 100%;
-      max-width: 600px;
-      background: var(--input-bg);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-    select {
-      width: 100%;
-      padding: 10px;
       margin: 10px 0;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      background-color: var(--input-bg);
-      color: var(--input-color);
     }
-    .custom-file {
-      position: relative;
+    .file-label {
       display: inline-block;
-      width: 100%;
-      margin: 10px 0;
-    }
-    .custom-file input[type="file"] {
-      position: absolute;
-      left: 0;
-      top: 0;
-      opacity: 0;
-      width: 100%;
-      height: 100%;
-      cursor: pointer;
-    }
-    .custom-file label {
-      display: block;
-      padding: 10px;
-      background-color: var(--button-bg);
+      padding: 10px 20px;
+      background-color: #0288d1;
       color: white;
-      text-align: center;
       border-radius: 6px;
       cursor: pointer;
+      margin-bottom: 5px;
     }
-    .custom-file-name {
-      margin-top: 5px;
-      font-size: 0.9rem;
-      text-align: center;
+    .file-name {
+      color: #555;
     }
-    button, #languageSelect {
+    input[type="file"] {
+      display: none;
+    }
+    input[type="text"], select {
       width: 100%;
-      padding: 12px;
-      background-color: var(--button-bg);
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      background-color: #03a9f4;
       color: white;
       border: none;
       border-radius: 6px;
-      font-size: 1rem;
       cursor: pointer;
-      transition: transform 0.2s ease-in-out, background-color 0.3s;
-      appearance: none;
-      text-align: center;
-      text-align-last: center;
-      margin-top: 10px;
     }
-    button:hover, #languageSelect:hover {
-      background-color: var(--button-hover);
-      transform: scale(1.02);
+    button:hover {
+      background-color: #0288d1;
     }
     #qrcode {
+      text-align: center;
       margin-top: 20px;
-      position: relative;
     }
-    #qrCanvas {
-      display: block;
-      margin: 0 auto;
-    }
-    textarea {
-      width: 100%;
-      height: 100px;
-      padding: 10px;
-      margin-top: 10px;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      background-color: var(--input-bg);
-      color: var(--input-color);
-      resize: vertical;
-    }
-    .sidebar {
-      max-width: 600px;
-      margin-top: 30px;
-      background-color: #f9f9f9;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    .note {
       font-size: 0.9rem;
-      color: #555;
+      margin-top: 20px;
+      color: #666;
+      line-height: 1.5;
     }
     footer {
+      text-align: center;
       margin-top: 40px;
       font-size: 0.8rem;
       color: #aaa;
@@ -147,143 +88,170 @@
   </style>
 </head>
 <body>
-  <h1 class="logo">QRコード生成アプリ</h1>
   <div class="container">
-    <textarea id="textInput" placeholder="テキストまたはURLを入力してください"></textarea>
+    <h1 id="app-title">QRコード生成アプリ</h1>
+    <input type="text" id="textInput" placeholder="テキストまたはURLを入力してください" />
     <div class="custom-file">
-      <label id="fileLabel" for="fileInput">ファイルを選択</label>
+      <label class="file-label" for="fileInput" id="fileLabel">ファイルを選択</label>
       <input type="file" id="fileInput" />
-      <div id="fileNameDisplay" class="custom-file-name">選択されていません</div>
+      <span class="file-name" id="fileName">選択されていません</span>
     </div>
-    <select id="qrSize">
-      <option value="128">小</option>
-      <option value="256" selected>中</option>
-      <option value="512">大</option>
-    </select>
-    <button onclick="generateQR()">QRコードを生成</button>
-    <button onclick="downloadQR()">QRコードをダウンロード</button>
-    <button onclick="toggleTheme()">ライト／ダーク切り替え</button>
-    <select id="languageSelect" onchange="setLanguage(this.value)">
-      <option value="ja">日本語</option>
-      <option value="en">English</option>
-      <option value="zh">中文</option>
-      <option value="es">Español</option>
-    </select>
-    <div id="qrcode"></div>
-  </div>
-  <div class="sidebar" id="sidebarText">
-    <p id="formatNote">✨ 対応形式: .txt / .csv / Excel (.xlsx のみ対応)</p>
-    <p id="privacyNote">⛑ 入力データは外部に送信されません</p>
-    <p id="googleNote">🔗 Google Docs などの共有URLも対応</p>
-  </div>
-  <footer>
-    &copy; 2025 QR App by osukakun ｜ All rights reserved。
-  </footer>
-  <script>
-    const fileInput = document.getElementById("fileInput");
-    const fileLabel = document.getElementById("fileLabel");
-    const fileNameDisplay = document.getElementById("fileNameDisplay");
-    const textInput = document.getElementById("textInput");
-    const qrcode = document.getElementById("qrcode");
 
+    <select id="sizeSelect">
+      <option value="200">小</option>
+      <option value="300">中</option>
+      <option value="400">大</option>
+    </select>
+
+    <button onclick="generateQRCode()" id="generateBtn">QRコードを生成</button>
+    <button onclick="downloadQRCode()" id="downloadBtn">QRコードをダウンロード</button>
+    <button onclick="toggleTheme()">ライト／ダーク切り替え</button>
+    <button onclick="switchLanguage()" id="languageBtn">日本語</button>
+    <div id="qrcode"></div>
+
+    <div class="note" id="note">
+      ✨ 対応形式：.txt / .csv / 画像（Base64）/ Excel（.xlsx のみ対応）<br>
+      🛡️ 入力データは外部に送信されません<br>
+      🔗 Google Docs などの共有URLも対応
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 QR App by osukakun | All rights reserved.
+  </footer>
+
+  <script>
     const translations = {
       ja: {
-        fileLabel: "ファイルを選択",
-        fileNone: "選択されていません",
-        formatNote: "✨ 対応形式: .txt / .csv / Excel (.xlsx のみ対応)",
-        privacyNote: "⛑ 入力データは外部に送信されません",
-        googleNote: "🔗 Google Docs などの共有URLも対応"
-      },
-      en: {
-        fileLabel: "Choose File",
-        fileNone: "No file selected",
-        formatNote: "✨ Supported formats: .txt / .csv / Excel (.xlsx only)",
-        privacyNote: "⛑ Your input data is not sent externally",
-        googleNote: "🔗 Google Docs shared URLs are also supported"
+        title: 'QRコード生成アプリ',
+        placeholder: 'テキストまたはURLを入力してください',
+        fileLabel: 'ファイルを選択',
+        noFile: '選択されていません',
+        generateBtn: 'QRコードを生成',
+        downloadBtn: 'QRコードをダウンロード',
+        sizeOptions: ['小', '中', '大'],
+        note: '✨ 対応形式：.txt / .csv / 画像（Base64）/ Excel（.xlsx のみ対応）<br>🛡️ 入力データは外部に送信されません<br>🔗 Google Docs などの共有URLも対応'
       },
       zh: {
-        fileLabel: "选择文件",
-        fileNone: "未选择文件",
-        formatNote: "✨ 支持格式：.txt / .csv / Excel（仅限 .xlsx）",
-        privacyNote: "⛑ 输入数据不会发送到外部",
-        googleNote: "🔗 支持 Google Docs 等共享链接"
+        title: 'QR码生成器',
+        placeholder: '请输入文本或网址',
+        fileLabel: '选择文件',
+        noFile: '未选择任何文件',
+        generateBtn: '生成QR码',
+        downloadBtn: '下载QR码',
+        sizeOptions: ['小', '中', '大'],
+        note: '✨ 支持格式：.txt / .csv / 图像（Base64）/ Excel（仅支持 .xlsx）<br>🛡️ 输入数据不会发送到外部<br>🔗 支持 Google Docs 等共享链接'
       },
       es: {
-        fileLabel: "Seleccionar archivo",
-        fileNone: "Ningún archivo seleccionado",
-        formatNote: "✨ Formatos compatibles: .txt / .csv / Excel (solo .xlsx)",
-        privacyNote: "⛑ Los datos no se envían al exterior",
-        googleNote: "🔗 También se admiten URL compartidas de Google Docs"
+        title: 'Generador de Código QR',
+        placeholder: 'Introduce texto o URL',
+        fileLabel: 'Seleccionar archivo',
+        noFile: 'No se ha seleccionado ningún archivo',
+        generateBtn: 'Generar Código QR',
+        downloadBtn: 'Descargar Código QR',
+        sizeOptions: ['Pequeño', 'Mediano', 'Grande'],
+        note: '✨ Formatos compatibles: .txt / .csv / imagen (Base64) / Excel (solo .xlsx)<br>🛡️ Los datos introducidos no se envían externamente<br>🔗 Compatible con enlaces compartidos como Google Docs'
       }
     };
 
     let currentLang = 'ja';
 
-    function setLanguage(lang) {
-      currentLang = lang;
-      const t = translations[lang];
-      fileLabel.textContent = t.fileLabel;
-      if (!fileInput.files.length) fileNameDisplay.textContent = t.fileNone;
-      document.getElementById("formatNote").textContent = t.formatNote;
-      document.getElementById("privacyNote").textContent = t.privacyNote;
-      document.getElementById("googleNote").textContent = t.googleNote;
+    function switchLanguage() {
+      const langs = Object.keys(translations);
+      const idx = langs.indexOf(currentLang);
+      currentLang = langs[(idx + 1) % langs.length];
+      const t = translations[currentLang];
+
+      document.getElementById('app-title').innerText = t.title;
+      document.getElementById('textInput').placeholder = t.placeholder;
+      document.getElementById('fileLabel').innerText = t.fileLabel;
+      document.getElementById('fileName').innerText = t.noFile;
+      document.getElementById('generateBtn').innerText = t.generateBtn;
+      document.getElementById('downloadBtn').innerText = t.downloadBtn;
+      document.getElementById('note').innerHTML = t.note;
+
+      const sizeSelect = document.getElementById('sizeSelect');
+      sizeSelect.innerHTML = '';
+      t.sizeOptions.forEach((label, i) => {
+        const val = (i + 2) * 100;
+        const opt = document.createElement('option');
+        opt.value = val;
+        opt.textContent = label;
+        sizeSelect.appendChild(opt);
+      });
+
+      document.getElementById('languageBtn').innerText = currentLang === 'ja' ? '日本語' : currentLang === 'zh' ? '中文' : 'Español';
     }
 
-    fileInput.addEventListener('change', () => {
-      const file = fileInput.files[0];
-      if (!file) return fileNameDisplay.textContent = translations[currentLang].fileNone;
+    document.getElementById('fileInput').addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
 
-      fileNameDisplay.textContent = file.name;
+      document.getElementById('fileName').innerText = file.name;
+
       const reader = new FileReader();
-      if (file.name.endsWith('.xlsx')) {
-        reader.onload = function(e) {
+      reader.onload = function(e) {
+        const text = e.target.result;
+        if (file.type === 'text/plain' || file.name.endsWith('.csv')) {
+          document.getElementById('textInput').value = text;
+        } else if (file.name.endsWith('.xlsx')) {
           const data = new Uint8Array(e.target.result);
           const workbook = XLSX.read(data, { type: 'array' });
           const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
           const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-          const cleanData = rows
-            .filter(row => row.some(cell => cell !== undefined && cell !== ''))
-            .map(row => row.map(cell => cell === undefined ? '' : String(cell).trim()).join(',')).join('\n');
-          textInput.value = cleanData;
-        };
+          const textValue = rows.flat().join(',');
+          document.getElementById('textInput').value = textValue;
+        } else if (file.type.startsWith('image')) {
+          const imgReader = new FileReader();
+          imgReader.onload = function(ev) {
+            document.getElementById('textInput').value = ev.target.result;
+          };
+          imgReader.readAsDataURL(file);
+        } else {
+          alert('対応していないファイル形式です。');
+        }
+      };
+      if (file.name.endsWith('.xlsx')) {
         reader.readAsArrayBuffer(file);
-      } else if (file.type.startsWith('text/')) {
-        reader.onload = e => {
-          textInput.value = e.target.result;
-        };
-        reader.readAsText(file);
       } else {
-        alert("このファイル形式には対応していません。");
+        reader.readAsText(file);
       }
     });
 
-    function generateQR() {
-      const text = textInput.value.trim();
-      if (!text) return alert("テキストを入力してください。");
-      const size = parseInt(document.getElementById("qrSize").value);
-      qrcode.innerHTML = "";
-      QRCode.toCanvas(text, { width: size }, (err, canvas) => {
-        if (!err) qrcode.appendChild(canvas);
-        else alert("QRコードの生成に失敗しました。");
-      });
+    function generateQRCode() {
+      const text = document.getElementById('textInput').value.trim();
+      const size = parseInt(document.getElementById('sizeSelect').value);
+      const qrcodeContainer = document.getElementById('qrcode');
+      qrcodeContainer.innerHTML = '';
+      if (!text) {
+        alert('テキストを入力してください。');
+        return;
+      }
+      try {
+        QRCode.toCanvas(document.createElement('canvas'), text, { width: size }, function(err, canvas) {
+          if (err) throw err;
+          qrcodeContainer.appendChild(canvas);
+        });
+      } catch (e) {
+        alert('QRコードの生成に失敗しました。');
+      }
     }
 
-    function downloadQR() {
-      const canvas = document.querySelector("#qrcode canvas");
-      if (!canvas) return alert("まずQRコードを生成してください。");
-      const link = document.createElement("a");
-      link.download = "qrcode.png";
+    function downloadQRCode() {
+      const canvas = document.querySelector('#qrcode canvas');
+      if (!canvas) return;
+      const link = document.createElement('a');
+      link.download = 'qrcode.png';
       link.href = canvas.toDataURL();
       link.click();
     }
 
     function toggleTheme() {
-      document.body.classList.toggle("dark");
+      document.body.classList.toggle('dark');
     }
 
-    setLanguage(currentLang);
+    switchLanguage();
   </script>
 </body>
 </html>
-
 
